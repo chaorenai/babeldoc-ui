@@ -119,6 +119,3 @@ X (formerly Twitter): https://x.com/xiaodus
 
 > ⚠️ This project only provides a UI layer; the core translation logic belongs to the official BabelDOC project.
 
-------
-
-是否还需要我为这个英文版生成对应的 GitHub 页面（如 `index.md` for GitHub Pages）？
