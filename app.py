@@ -191,7 +191,7 @@ https://x.com/xiaodus
     with gr.Row():
         api_key = gr.Text(label="API Key（OpenAI/DeepSeek 填写）", type="password", value=MODEL_PRESETS["OpenAI"]["api_key"])
         base_url = gr.Text(label="API Base URL", value=MODEL_PRESETS["OpenAI"]["base_url"])
-        model_name = gr.Dropdown(label="模型名称", choices=[MODEL_PRESETS["OpenAI"]['default_model']], value=MODEL_PRESETS["OpenAI"]['default_model'], interactive=True)
+        model_name = gr.Dropdown(label="模型名称", choices=[MODEL_PRESETS["OpenAI"]['default_model']], value=MODEL_PRESETS["OpenAI"]['default_model'], interactive=True, allow_custom_value=True)
         refresh_btn = gr.Button("🔄 刷新模型列表")
 
     with gr.Row():
