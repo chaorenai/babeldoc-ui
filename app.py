@@ -13,22 +13,21 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 MODEL_PRESETS = {
     "OpenAI": {
-        "base_url": "https://api.openai.com/v1",
-        "api_key": "",
-        "default_model": "gpt-4o"
+        "base_url": os.getenv("DEFAULT_OPENAI_BASE_URL", "https://api.openai.com/v1"),
+        "api_key": os.getenv("DEFAULT_OPENAI_API_KEY", ""),
+        "default_model": os.getenv("DEFAULT_OPENAI_DEFAULT_MODEL", "gpt-4o")
     },
     "DeepSeek": {
-        "base_url": "https://api.deepseek.com/v1",
-        "api_key": "",
-        "default_model": "deepseek-chat"
+        "base_url": os.getenv("DEFAULT_DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
+        "api_key": os.getenv("DEFAULT_DEEPSEEK_API_KEY", ""),
+        "default_model": os.getenv("DEFAULT_DEEPSEEK_DEFAULT_MODEL", "deepseek-chat")
     },
     "Ollama (本地模型)": {
-        "base_url": "http://localhost:11434/v1",
-        "api_key": "a",
-        "default_model": "llama3"
+        "base_url": os.getenv("DEFAULT_OLLAMA_BASE_URL", "http://localhost:11434/v1"),
+        "api_key": os.getenv("DEFAULT_OLLAMA_API_KEY", ""),
+        "default_model": os.getenv("DEFAULT_OLLAMA_DEFAULT_MODEL", "llama3")
     }
 }
-
 def run_babeldoc_translation(input_path, output_path, model_name, base_url, api_key, lang_in, lang_out,
                              dual_output, no_watermark, skip_clean, rich_text_disable,
                              enhance, max_pages, min_length):
@@ -186,9 +185,9 @@ https://x.com/xiaodus
         )
 
     with gr.Row():
-        api_key = gr.Text(label="API Key（OpenAI/DeepSeek 填写）", type="password")
-        base_url = gr.Text(label="API Base URL")
-        model_name = gr.Dropdown(label="模型名称", choices=[], value=None, interactive=True)
+        api_key = gr.Text(label="API Key（OpenAI/DeepSeek 填写）", type="password", value=MODEL_PRESETS["OpenAI"]["api_key"])
+        base_url = gr.Text(label="API Base URL", value=MODEL_PRESETS["OpenAI"]["base_url"])
+        model_name = gr.Dropdown(label="模型名称", choices=[], value=MODEL_PRESETS["OpenAI"]['default_model'], interactive=True)
         refresh_btn = gr.Button("🔄 刷新模型列表")
 
     with gr.Row():
@@ -224,4 +223,4 @@ https://x.com/xiaodus
     )
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(server_name="0.0.0.0", server_port=int(os.getenv("SERVER_PORT", "7860")))
