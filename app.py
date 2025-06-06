@@ -24,7 +24,7 @@ MODEL_PRESETS = {
     },
     "Ollama (本地模型)": {
         "base_url": os.getenv("DEFAULT_OLLAMA_BASE_URL", "http://localhost:11434/v1"),
-        "api_key": os.getenv("DEFAULT_OLLAMA_API_KEY", ""),
+        "api_key": os.getenv("DEFAULT_OLLAMA_API_KEY", "a"),
         "default_model": os.getenv("DEFAULT_OLLAMA_DEFAULT_MODEL", "llama3")
     }
 }
@@ -65,7 +65,11 @@ def run_babeldoc_translation(input_path, output_path, model_name, base_url, api_
     print("📦 执行命令：", " ".join(command))
 
     try:
-        result = subprocess.run(command, check=True, text=True, capture_output=True)
+        log = ""
+        with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1) as proc:
+            for line in proc.stdout:
+                print(line, end="")
+                log += line
     except subprocess.CalledProcessError as e:
         return f"翻译出错：{str(e)}", None
 
@@ -75,10 +79,10 @@ def run_babeldoc_translation(input_path, output_path, model_name, base_url, api_
         reverse=True
     )
     if not pdf_files:
-        return f"{result.stdout}\n\n翻译失败：未生成输出文件", None
+        return f"{log}\n\n翻译失败：未生成输出文件", None
 
     translated_path = os.path.join(output_path, pdf_files[0])
-    return f"{result.stdout}\n\n翻译完成 ✅，点击下方链接下载", translated_path
+    return f"{log}\n\n翻译完成 ✅，点击下方链接下载", translated_path
 
 def get_ollama_models():
     try:
