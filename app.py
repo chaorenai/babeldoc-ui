@@ -30,7 +30,7 @@ MODEL_PRESETS = {
 }
 def run_babeldoc_translation(input_path, output_path, model_name, base_url, api_key, lang_in, lang_out,
                              dual_output, no_watermark, skip_clean, rich_text_disable,
-                             enhance, max_pages, min_length):
+                             enhance, max_pages, min_length, qps, pages):
     command = [
         "babeldoc",
         "--files", input_path,
@@ -57,11 +57,15 @@ def run_babeldoc_translation(input_path, output_path, model_name, base_url, api_
         command.extend(["--max-pages-per-part", str(max_pages)])
     if min_length:
         command.extend(["--min-text-length", str(min_length)])
+    if qps:
+        command.extend(["--qps", str(qps)])
+    if pages:
+        command.extend(["--pages", pages])
 
     print("📦 执行命令：", " ".join(command))
 
     try:
-        subprocess.run(command, check=True)
+        result = subprocess.run(command, check=True, text=True, capture_output=True)
     except subprocess.CalledProcessError as e:
         return f"翻译出错：{str(e)}", None
 
@@ -71,10 +75,10 @@ def run_babeldoc_translation(input_path, output_path, model_name, base_url, api_
         reverse=True
     )
     if not pdf_files:
-        return "翻译失败：未生成输出文件", None
+        return f"{result.stdout}\n\n翻译失败：未生成输出文件", None
 
     translated_path = os.path.join(output_path, pdf_files[0])
-    return "翻译完成 ✅，点击下方链接下载：", translated_path
+    return f"{result.stdout}\n\n翻译完成 ✅，点击下方链接下载", translated_path
 
 def get_ollama_models():
     try:
@@ -99,7 +103,7 @@ def get_openai_models(api_key, base_url):
 
 def translate_pdf(pdf_file, provider, api_key, base_url, model_name,
                   lang_in, lang_out, dual_output, no_watermark,
-                  skip_clean, rich_text_disable, enhance, max_pages, min_length):
+                  skip_clean, rich_text_disable, enhance, max_pages, min_length, qps, pages):
     if not pdf_file:
         return "请上传 PDF 文件", None
 
@@ -129,7 +133,7 @@ def translate_pdf(pdf_file, provider, api_key, base_url, model_name,
     return run_babeldoc_translation(
         input_path, output_subdir, model_name, base_url, api_key,
         lang_in, lang_out, dual_output, no_watermark,
-        skip_clean, rich_text_disable, enhance, max_pages, min_length
+        skip_clean, rich_text_disable, enhance, max_pages, min_length, qps, pages
     )
 
 def update_provider(provider):
@@ -187,7 +191,7 @@ https://x.com/xiaodus
     with gr.Row():
         api_key = gr.Text(label="API Key（OpenAI/DeepSeek 填写）", type="password", value=MODEL_PRESETS["OpenAI"]["api_key"])
         base_url = gr.Text(label="API Base URL", value=MODEL_PRESETS["OpenAI"]["base_url"])
-        model_name = gr.Dropdown(label="模型名称", choices=[], value=MODEL_PRESETS["OpenAI"]['default_model'], interactive=True)
+        model_name = gr.Dropdown(label="模型名称", choices=[MODEL_PRESETS["OpenAI"]['default_model']], value=MODEL_PRESETS["OpenAI"]['default_model'], interactive=True)
         refresh_btn = gr.Button("🔄 刷新模型列表")
 
     with gr.Row():
@@ -202,6 +206,8 @@ https://x.com/xiaodus
         enhance = gr.Checkbox(label="增强兼容性 (enhance-compatibility)", value=True)
         max_pages = gr.Textbox(label="最大分块页数 (max-pages-per-part)", value="1")
         min_length = gr.Textbox(label="最小翻译长度 (min-text-length)", value="5")
+        qps = gr.Textbox(label="翻译服务 QPS 限制", value="3")
+        pages = gr.Textbox(label="指定页面 (pages)", value="")
 
     run_button = gr.Button("🚀 开始翻译")
     status = gr.Textbox(label="状态", interactive=False)
@@ -218,7 +224,7 @@ https://x.com/xiaodus
         fn=translate_pdf,
         inputs=[pdf_file, provider, api_key, base_url, model_name,
                 lang_in, lang_out, dual_output, no_watermark,
-                skip_clean, rich_text_disable, enhance, max_pages, min_length],
+                skip_clean, rich_text_disable, enhance, max_pages, min_length, qps, pages],
         outputs=[status, result_pdf]
     )
 
