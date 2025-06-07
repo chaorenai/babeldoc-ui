@@ -25,14 +25,16 @@ Supported model sources:
 
 ## 🛠️ Installation
 
-### 1. Clone the repository
+### 🧪 From source:
+
+#### 1. Clone the repository
 
 ```bash
 git clone https://github.com/chaorenai/babeldoc-ui.git
 cd babeldoc-ui
 ```
 
-### 2. Install dependencies
+#### 2. Install dependencies
 
 It is recommended to use a virtual environment such as `conda` or `venv`:
 
@@ -45,7 +47,8 @@ venv\Scripts\activate  # On Windows
 pip install -r requirements.txt
 ```
 
-### 3. Run the application
+#### 3. Run the application
+
 
 ```bash
 python app.py
@@ -53,7 +56,20 @@ python app.py
 
 Your browser will automatically open: [http://127.0.0.1:7860](http://127.0.0.1:7860/)
 
-------
+### 🐳 Using Docker Compose:
+
+#### 1. Clone the repository
+```bash
+git clone https://github.com/chaorenai/babeldoc-ui.git
+cd babeldoc-ui
+```
+#### 2. Run with Docker Compose
+
+```bash
+docker-compose up -d 
+```
+
+Then you can open the link [http://127.0.0.1:7860](http://127.0.0.1:7860) in your browser.
 
 ## ⚙️ BabelDOC Installation
 
